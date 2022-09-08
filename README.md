@@ -46,7 +46,7 @@ Optional parameters:
 
 | param         | value type        | description  |
 | ------------- | ------------- | ------------ |
-| marker_to_taxon_path | path to file | summarize_marker_alignments --marker_to_taxon_path parameter |
+| markerToTaxonPath | path to file | summarize_marker_alignments --refdb-marker-to-taxon-path parameter |
 | unpackMethod | "bz2" | for FTP .tar.bz2 content |
 
 ### How to use this software
@@ -55,7 +55,7 @@ This is research software. You can use it as is to check you are getting the res
 The Python module [`marker_alignments`](https://github.com/wbazant/marker_alignments) does almost all the tricks, but it requires alignments as input. Meanwhile, this pipeline helps you orchestrate the process of downloading fastqs and running the alignments, so you can do eukaryotic detection at scale.
 
 #### Reference databases
-You will need to provide `--refdb` and `--refdb-marker-to-taxon-path` so that they correspond to your chosen reference. For the publication, we used EukDetect's databases: see [their documentation](https://github.com/allind/EukDetect) for how to download them.
+You will need to provide `--refdb` and `--markerToTaxonPath` so that they correspond to your chosen reference. For the publication, we used EukDetect's databases: see [their documentation](https://github.com/allind/EukDetect) for how to download them.
 
 #### Execution environment
 We ran this pipeline locally on a Ubuntu laptop, and on our LSF cluster, adding a `cluster.conf` file that made sense for our run. You might need to adjust the Nextflow commands to make them suitable for your execution environment. 
@@ -79,7 +79,7 @@ nextflow run wbazant/CORRAL -r main \
   --unpackMethod bz2 \
   --libraryLayout paired \
   --refdb ${REF_PATH}/ncbi_eukprot_met_arch_markers.fna \
-  --marker_to_taxon_path ${REF_PATH}/busco_taxid_link.txt  \
+  --markerToTaxonPath ${REF_PATH}/busco_taxid_link.txt  \
   -c $DIR/cluster.conf \
   -with-trace -resume | tee $DIR/tee.out
 
