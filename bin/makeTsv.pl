@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use feature 'say';
-use List::MoreUtils qw/first_index/;
 use File::Basename;
 
 
@@ -24,6 +23,16 @@ die "No files in input directory" unless @files;
 
 my %sampleLabels;
 
+sub firstIndex {
+  my ($chosenColumn, $line) = @_;
+  for my $ix (0..$#$line){
+    if ($line->[$ix] eq $chosenColumn){
+      return $ix;
+    }
+  }
+  return -1;
+}
+
 my %result;
 my @result;
 for my $file (@files){
@@ -42,7 +51,7 @@ for my $file (@files){
     my @line = split "\t";
 
     if ($. == 1){
-      $chosenColumnIndex = first_index {$_ eq $chosenColumn} @line;
+      $chosenColumnIndex = firstIndex($chosenColumn, \@line);
       die "Could not find value column $chosenColumn in $file, header not recognised: $_" unless $chosenColumnIndex > -1;
     } else{
       my $taxon = $line[0];
