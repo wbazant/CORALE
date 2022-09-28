@@ -39,7 +39,7 @@ Main parameters:
 | resultDir  | path to dir  | publish directory |
 | refdb | path pattern | bowtie2 -x parameter |
 | bowtie2Command | shell | Run bowtie2 |
-| alignmentStatsCommand | shell | `samtools stats` or other |
+| alignmentStatsCommand | shell | `samtools stats` by default. Set to 'none' to switch off |
 | summarizeAlignmentsCommand | shell | path to `marker_alignments` optionally with filter arguments to use|
 
 Optional parameters:

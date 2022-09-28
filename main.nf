@@ -174,7 +174,9 @@ process makeTsv {
 }
 
 def postAlign(sample_numReadsPath_alignmentsSam) {
-  alignmentStats(sample_numReadsPath_alignmentsSam)
+  if(params.alignmentStatsCommand != 'none'){
+    alignmentStats(sample_numReadsPath_alignmentsSam)
+  }
   return summarizeAlignments(sample_numReadsPath_alignmentsSam)
 }
 
