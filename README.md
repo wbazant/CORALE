@@ -3,6 +3,7 @@
 ## Introduction
 CORRAL is a Nextflow pipeline wrapping a Python module, `marker_alignments`, and combining it with fetch and align steps, to provide a workflow for estimating what taxa are present in the sample.
 
+Our article about CORRAL, "Improved eukaryotic detection compatible with large-scale automated analysis of metagenomes", has now been published in Microbiome: https://doi.org/10.1186/s40168-023-01505-1.
 
 ## Installation
 This workflow is not containerised, but the dependencies are quite minimal:
