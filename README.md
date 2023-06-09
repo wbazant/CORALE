@@ -49,6 +49,7 @@ Optional parameters:
 | ------------- | ------------- | ------------ |
 | markerToTaxonPath | path to file | summarize_marker_alignments --refdb-marker-to-taxon-path parameter |
 | unpackMethod | "bz2" | for FTP .tar.bz2 content |
+| summaryColumn | "cpm","taxon_num_reads","taxon_num_alignments","taxon_num_markers" | Column to report in final matrix (default: cpm) |
 
 ### How to use this software
 This is research software. You can use it as is to check you are getting the results similar to the ones we did, and you can also build upon it.
