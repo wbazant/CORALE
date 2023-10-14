@@ -65,31 +65,39 @@ If you want to process many samples in parallel, add a configuration file, like 
 #### Experimenting with the method
 If you want to experiment with the method - for example, see what happens if you do not filter at all - you can override the default `summarizeAlignmentsCommand` parameter and provide a different `--resultDir`. Nextflow is able to reuse previously done steps, so changing `summarizeAlignmentsCommand` will not re-run the download or alignment steps. Here is an [example](https://github.com/wbazant/markerAlignmentsPaper/blob/master/scripts/run_our_method_on_unknown_euks.sh).
 
-### Example - cluster run
+### Example config
 
 #### `run.sh`
 ```
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # assuming reference of markers is provided here
 REF_PATH="~/eukaryotic_markers_db"
 
+# A list of samples and where to get them from - see example below
+INPUT_TSV="./in.tsv"
+
+# Cluster or local configuration - see example below
+RESOURCE_CONF="./resource_configuration.conf"
+
+# Pull the code
 nextflow pull wbazant/CORRAL -r main
 
+# Run the pipeline
 nextflow run wbazant/CORRAL -r main \
-  --inputPath $DIR/in.tsv  \
-  --resultDir $DIR/results \
+  --inputPath $INPUT_TSV  \
+  --resultDir ./results \
   --downloadMethod wget \
   --unpackMethod bz2 \
   --libraryLayout paired \
   --refdb ${REF_PATH}/ncbi_eukprot_met_arch_markers.fna \
   --markerToTaxonPath ${REF_PATH}/busco_taxid_link.txt  \
-  -c $DIR/resource_configuration.conf \
-  -with-trace -resume | tee $DIR/tee.out
+  -c ./$RESOURCE_CONF \
+  -with-trace -resume
 
 ```
 
 #### `resource_configuration.conf`
 
+For LSF processing this could be a good config:
 ```  
 process {
   executor = 'lsf'
@@ -104,7 +112,14 @@ process {
   }
 }
 ```
-The above config makes sense for a distributed computing environment. To orchestrate parallel execution on a laptop, remove `executor = 'lsf'`, and reduce the number of forks. Raising it above what you can download in parallel or above the number of cores of your CPU will not speed up the processing, so for example `maxForks = 3` will be a good value. Monitor the temperature of your machine and make sure it does not overheat: `bowtie2` uses the CPU really intensely.
+
+For processing using local resources, like a laptop, three is a good number of forks (parallel jobs):
+```  
+process {
+  maxForks = 3
+}
+```
+
 
 #### `in.tsv`
 ```
