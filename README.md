@@ -54,13 +54,13 @@ Optional parameters:
 ### How to use this software
 This is research software. You can use it as is to check you are getting the results similar to the ones we did, and you can also build upon it.
 
-The Python module [`marker_alignments`](https://github.com/wbazant/marker_alignments) does almost all the tricks, but it requires alignments as input. Meanwhile, this pipeline helps you orchestrate the process of downloading fastqs and running the alignments, so you can do eukaryotic detection at scale.
+The Python module [`marker_alignments`](https://github.com/wbazant/marker_alignments) forms the core of the method, but it is written to accept alignments as input. To complement the module, this Nextflow pipeline helps you orchestrate the process of downloading fastqs and running the alignments, so you can do eukaryotic detection at scale. If you want to do the alignments yourself or orchestrate them differently, you can just use the module.
 
 #### Reference databases
 You will need to provide `--refdb` and `--markerToTaxonPath` so that they correspond to your chosen reference. For the publication, we used EukDetect's databases: see [their documentation](https://github.com/allind/EukDetect) for how to download them.
 
 #### Execution environment
-We ran this pipeline locally on a Ubuntu laptop, and on our LSF cluster, adding a `cluster.conf` file that made sense for our run. You might need to adjust the Nextflow commands to make them suitable for your execution environment. 
+If you want to process many samples in parallel, add a configuration file, like the `resource_configuration.conf` file shown below. You might need to adjust the Nextflow commands to make them suitable for your execution environment. We tested this pipeline locally on a Ubuntu laptop, and on our LSF cluster.
 
 #### Experimenting with the method
 If you want to experiment with the method - for example, see what happens if you do not filter at all - you can override the default `summarizeAlignmentsCommand` parameter and provide a different `--resultDir`. Nextflow is able to reuse previously done steps, so changing `summarizeAlignmentsCommand` will not re-run the download or alignment steps. Here is an [example](https://github.com/wbazant/markerAlignmentsPaper/blob/master/scripts/run_our_method_on_unknown_euks.sh).
@@ -70,7 +70,8 @@ If you want to experiment with the method - for example, see what happens if you
 #### `run.sh`
 ```
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-REF_PATH="~/eukprot"
+# assuming reference of markers is provided here
+REF_PATH="~/eukaryotic_markers_db"
 
 nextflow pull wbazant/CORRAL -r main
 
@@ -82,12 +83,12 @@ nextflow run wbazant/CORRAL -r main \
   --libraryLayout paired \
   --refdb ${REF_PATH}/ncbi_eukprot_met_arch_markers.fna \
   --markerToTaxonPath ${REF_PATH}/busco_taxid_link.txt  \
-  -c $DIR/cluster.conf \
+  -c $DIR/resource_configuration.conf \
   -with-trace -resume | tee $DIR/tee.out
 
 ```
 
-#### `cluster.conf`
+#### `resource_configuration.conf`
 
 ```  
 process {
@@ -103,13 +104,16 @@ process {
   }
 }
 ```
-If you want to run the pipeline locally, remove `executor = 'lsf'`, and reduce the number of forks. Raising it above what you can download in parallel, or to the number of cores of your CPU, will not speed things up, so for example `maxForks = 3` will be a good value. Monitor the temperature of your machine and make sure it does not overheat: `bowtie2` uses the CPU really intensely.
+The above config makes sense for a distributed computing environment. To orchestrate parallel execution on a laptop, remove `executor = 'lsf'`, and reduce the number of forks. Raising it above what you can download in parallel or above the number of cores of your CPU will not speed up the processing, so for example `maxForks = 3` will be a good value. Monitor the temperature of your machine and make sure it does not overheat: `bowtie2` uses the CPU really intensely.
 
 #### `in.tsv`
 ```
 SRS011061       https://downloads.hmpdacc.org/dacc/hhs/genome/microbiome/wgs/analysis/hmwgsqc/v1/SRS011061.tar.bz2
 SRS011086       https://downloads.hmpdacc.org/dacc/hhs/genome/microbiome/wgs/analysis/hmwgsqc/v1/SRS011086.tar.bz2
 ```
-This is the correct content for `--downloadMethod wget --unpackMethod bz2`. For other input combinations, check the pipeline code - it's usually two or three columns. The first one is an sample ID, the second one is path or URL, and for the `libraryLayout paired` and no `--unpackMethod` it's pathForward then pathReverse.
+This is the correct format of an input file corresponding to arguments `--downloadMethod wget --unpackMethod bz2`. The first column is sample ID, and the second column is a URL.
 
+If you want a paired library layout (the `--libraryLayout paired` option), specify three columns: sampleId, pathForward, pathReverse. [example - paired layout](https://github.com/wbazant/CORRAL/blob/main/data/pairedWget.tsv).
+
+If you want local files (the `--downloadMethod local` option) specify a file path instead of a URL.
 
