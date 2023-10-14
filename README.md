@@ -113,7 +113,7 @@ process {
 }
 ```
 
-For processing using local resources, like a laptop, three is a good number of forks (parallel jobs):
+For processing using local resources, like a laptop, three is a good number of forks (parallel jobs), and you don't need the other stuff, so you can just have a simple config:
 ```  
 process {
   maxForks = 3
